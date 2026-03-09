@@ -1,0 +1,22 @@
+# Dependencies
+lib/
+node_modules/
+
+# Env and keys
+.env
+.env.*
+!.env.example
+
+# Build
+out/
+cache/
+broadcast/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
