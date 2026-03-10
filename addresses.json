@@ -2,11 +2,13 @@
   "baseSepolia": {
     "chainId": 84532,
     "router": "",
+    "gateway": "0xbe710276c4114c3846a209191a8800049b8ad0a6",
     "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
   },
   "base": {
     "chainId": 8453,
     "router": "",
+    "gateway": "",
     "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
   }
 }
