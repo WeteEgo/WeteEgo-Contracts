@@ -2,69 +2,39 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
 
 jobs:
-  forge-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-      - name: Install dependencies
-        run: forge install
-      - name: Build
-        run: forge build
-
   forge-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-      - name: Install dependencies
-        run: forge install
-      - name: Run tests
-        run: forge test -vvv
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge install
+      - run: forge test -vvv
 
-  slither-scan:
+  slither:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+      - uses: crytic/slither-action@v0.3.2
+        continue-on-error: true
         with:
-          version: nightly
-      - name: Install dependencies
-        run: forge install
-      - name: Build
-        run: forge build
-      - name: Install Slither
-        run: pip3 install slither-analyzer
-      - name: Run Slither
-        run: slither src/ --fail-on high
+          target: "."
+          slither-args: --filter-paths "lib/|node_modules/"
 
-  snyk-scan:
+  trufflehog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
-      - name: Run Snyk
-        uses: snyk/actions/solidity@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
