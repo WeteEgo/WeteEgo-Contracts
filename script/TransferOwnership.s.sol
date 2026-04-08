@@ -18,10 +18,12 @@ interface IGateway {
  * @notice Transfer ownership of WeteEgoRouter and WeteEgoGateway to a Gnosis Safe multisig.
  *
  * Required env vars:
- *   PRIVATE_KEY         — current owner EOA private key
  *   MULTISIG_ADDRESS    — Gnosis Safe address to transfer ownership to
  *   ROUTER_ADDRESS      — deployed WeteEgoRouter address (optional; skip if empty)
  *   GATEWAY_ADDRESS     — deployed WeteEgoGateway address
+ *
+ * Uses Foundry keystore — no plain-text private key needed.
+ * Import your deployer wallet once: cast wallet import deployer --interactive
  *
  * WeteEgoRouter uses a one-step setOwner() — ownership transfers immediately.
  * WeteEgoGateway uses Ownable2Step — the multisig must call acceptOwnership() to complete.
@@ -29,6 +31,7 @@ interface IGateway {
  * Run:
  *   forge script script/TransferOwnership.s.sol \
  *     --rpc-url base_sepolia \
+ *     --account deployer \
  *     --broadcast \
  *     --verify
  */
@@ -40,9 +43,7 @@ contract TransferOwnership is Script {
         require(multisig != address(0), "MULTISIG_ADDRESS not set");
         require(gatewayAddr != address(0), "GATEWAY_ADDRESS not set");
 
-        uint256 pk = vm.envUint("PRIVATE_KEY");
-
-        vm.startBroadcast(pk);
+        vm.startBroadcast();
 
         // ── WeteEgoRouter ────────────────────────────────────────────────────
         bytes memory routerEnv = abi.encode(vm.envOr("ROUTER_ADDRESS", address(0)));
